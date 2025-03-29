@@ -30,19 +30,19 @@ public class Statistics {
         Map<Subject, Long> enrolmentCount = new HashMap<>();
         Map<Subject, Long> activityCount = new HashMap<>();
         Map<Subject, Double> averageScore = new HashMap<>();
-        Long minEnrolmentCount = Long.MAX_VALUE;
-        Long maxEnrolmentCount = Long.MIN_VALUE;
-        Long minActivityCount = Long.MAX_VALUE;
-        Long maxActivityCount = Long.MIN_VALUE;
-        Double minAverageScore = Double.MAX_VALUE;
-        Double maxAverageScore = Double.MIN_VALUE;
+        long minEnrolmentCount = Long.MAX_VALUE;
+        long maxEnrolmentCount = Long.MIN_VALUE;
+        long minActivityCount = Long.MAX_VALUE;
+        long maxActivityCount = Long.MIN_VALUE;
+        double minAverageScore = Double.MAX_VALUE;
+        double maxAverageScore = Double.MIN_VALUE;
 
         boolean noActivities = true;
 
         for (Subject subject : Subject.values()) {
-            Long enrolment = Statistics.countEnrolled(students.values(), subject);
-            Long activity = Statistics.countActivities(students.values(), subject);
-            Double average = Statistics.averageScore(students.values(), subject);
+            long enrolment = Statistics.countEnrolled(students.values(), subject);
+            long activity = Statistics.countActivities(students.values(), subject);
+            double average = Statistics.averageScore(students.values(), subject);
             if (activity > 0) {
                 noActivities = false;
             }
@@ -67,6 +67,10 @@ public class Statistics {
         if (noActivities) {
             System.out.println("Most popular: n/a");
             System.out.println("Least popular: n/a");
+            System.out.println("Highest activity: n/a");
+            System.out.println("Lowest activity: n/a");
+            System.out.println("Easiest course: n/a");
+            System.out.println("Hardest course: n/a");
         } else {
             String most = Statistics.extremeSubjects(enrolmentCount, finalMaxEnrolmentCount);
             String least = Statistics.extremeSubjects(enrolmentCount, finalMinEnrolmentCount);
@@ -75,12 +79,7 @@ public class Statistics {
             }
             System.out.printf("Most popular: %s%n", most);
             System.out.printf("Least popular: %s%n", least);
-        }
 
-        if (noActivities) {
-            System.out.println("Highest activity: n/a");
-            System.out.println("Lowest activity: n/a");
-        } else {
             String highest = Statistics.extremeSubjects(activityCount, finalMaxActivityCount);
             String lowest = Statistics.extremeSubjects(activityCount, finalMinActivityCount);
             if (finalMinActivityCount.equals(finalMaxActivityCount)) {
@@ -88,12 +87,7 @@ public class Statistics {
             }
             System.out.printf("Highest activity: %s%n", highest);
             System.out.printf("Lowest activity: %s%n", lowest);
-        }
 
-        if (noActivities) {
-            System.out.println("Easiest course: n/a");
-            System.out.println("Hardest course: n/a");
-        } else {
             String easiest = Statistics.extremeSubjects(averageScore, finalMaxAverageScore);
             String hardest = Statistics.extremeSubjects(averageScore, finalMinAverageScore);
             if (finalMaxAverageScore.equals(finalMinAverageScore)) {
