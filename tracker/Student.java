@@ -1,18 +1,22 @@
 package tracker;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
+import java.util.function.ToIntFunction;
 
 public class Student {
-    private UUID id;
-    private String email;
-    private String name;
-    private Grades grades;
+    private final UUID id;
+    private final String email;
+    private final String name;
+    private final List<Activity> activities;
 
     public Student(String email, String name) {
         this.id = UUID.randomUUID();
         this.email = email;
         this.name = name;
-        this.grades = new Grades();
+        this.activities = new ArrayList<>();
     }
 
     public String getId() {
@@ -23,27 +27,31 @@ public class Student {
         return this.email;
     }
 
-    public void addPoints(int java, int dsa, int databases, int spring) {
-        this.grades.java += java;
-        this.grades.dsa += dsa;
-        this.grades.databases += databases;
-        this.grades.spring += spring;
+    public void addActivity(Activity activity) {
+        this.activities.add(activity);
     }
 
     public void printDetails() {
         System.out.printf("%s points: Java=%d; DSA=%d; Databases=%d; Spring=%d%n",
                 this.id.toString(),
-                this.grades.java,
-                this.grades.dsa,
-                this.grades.databases,
-                this.grades.spring
+                Arrays.stream(this.getSubject(Subject.JAVA)).sum(),
+                Arrays.stream(this.getSubject(Subject.DSA)).sum(),
+                Arrays.stream(this.getSubject(Subject.DATABASES)).sum(),
+                Arrays.stream(this.getSubject(Subject.SPRING)).sum()
         );
     }
 
-    private static class Grades {
-        Integer java = 0;
-        Integer dsa = 0;
-        Integer databases = 0;
-        Integer spring = 0;
+    public boolean isEnrolled(Subject subject) {
+        return this.getSubject(subject).length == 0;
+    }
+
+    public int[] getSubject(Subject subject) {
+        ToIntFunction<Activity> getGrades = switch(subject) {
+            case JAVA -> Activity::java;
+            case DSA -> Activity::dsa;
+            case DATABASES -> Activity::databases;
+            case SPRING -> Activity::spring;
+        };
+        return this.activities.stream().mapToInt(getGrades).filter(grade -> grade != 0).toArray();
     }
 }

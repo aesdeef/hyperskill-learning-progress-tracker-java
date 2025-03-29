@@ -17,6 +17,7 @@ public class App {
                 case "add points" -> this.addPoints();
                 case "list" -> this.list();
                 case "find" -> this.find();
+                case "statistics" -> this.statistics();
                 case "back" -> System.out.println("Enter 'exit' to exit the program.");
                 case "exit" -> {
                     System.out.println("Bye!");
@@ -100,7 +101,8 @@ public class App {
                 System.out.println("Incorrect points format");
                 continue;
             }
-            student.addPoints(grades[0], grades[1], grades[2], grades[3]);
+            Activity activity = new Activity(grades[0], grades[1], grades[2], grades[3]);
+            student.addActivity(activity);
             System.out.println("Points updated");
         }
     }
@@ -125,6 +127,57 @@ public class App {
                 continue;
             }
             student.printDetails();
+        }
+    }
+
+    private void statistics() {
+        System.out.println("Type the name of a course to see details or 'back' to quit");
+        Statistics.printOverall(students);
+
+        while (true) {
+            String choice = scanner.nextLine().trim().toLowerCase();
+            Subject subject;
+            switch (choice) {
+                case "back" -> {
+                    return;
+                }
+                case "java" -> subject = Subject.JAVA;
+                case "dsa" -> subject = Subject.DSA;
+                case "databases" -> subject = Subject.DATABASES;
+                case "spring" -> subject = Subject.SPRING;
+                default -> {
+                    System.out.println("Unknown course.");
+                    continue;
+                }
+            }
+            System.out.println(subject);
+            System.out.println("id\tpoints\tcompleted");
+            int maxScore = switch (subject) {
+                case JAVA -> 600;
+                case DSA -> 400;
+                case DATABASES -> 480;
+                case SPRING -> 550;
+            };
+            List<Points> results = new ArrayList<>();
+            for (Student s : students.values()) {
+                int[] grades = s.getSubject(subject);
+                if (grades.length == 0) {
+                    continue;
+                }
+                int total = Arrays.stream(grades).sum();
+                results.add(new Points(s.getId(), total));
+            }
+            results.sort(
+                Comparator.comparing(Points::points, Comparator.reverseOrder()).thenComparing(Points::id)
+            );
+            for (Points result : results) {
+                float percentage = result.points() * 100f / maxScore;
+                System.out.printf("%s %d %.1f%%%n",
+                        result.id(),
+                        result.points(),
+                        percentage
+                );
+            }
         }
     }
 
