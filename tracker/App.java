@@ -18,6 +18,7 @@ public class App {
                 case "list" -> this.list();
                 case "find" -> this.find();
                 case "statistics" -> this.statistics();
+                case "notify" -> this.notifyStudents();
                 case "back" -> System.out.println("Enter 'exit' to exit the program.");
                 case "exit" -> {
                     System.out.println("Bye!");
@@ -152,12 +153,7 @@ public class App {
             }
             System.out.println(subject);
             System.out.println("id\tpoints\tcompleted");
-            int maxScore = switch (subject) {
-                case JAVA -> 600;
-                case DSA -> 400;
-                case DATABASES -> 480;
-                case SPRING -> 550;
-            };
+            int maxScore = subject.target();
             List<Points> results = new ArrayList<>();
             for (Student s : students.values()) {
                 int[] grades = s.getSubject(subject);
@@ -168,7 +164,7 @@ public class App {
                 results.add(new Points(s.getId(), total));
             }
             results.sort(
-                Comparator.comparing(Points::points, Comparator.reverseOrder()).thenComparing(Points::id)
+                    Comparator.comparing(Points::points, Comparator.reverseOrder()).thenComparing(Points::id)
             );
             for (Points result : results) {
                 float percentage = result.points() * 100f / maxScore;
@@ -179,6 +175,33 @@ public class App {
                 );
             }
         }
+    }
+
+    private void notifyStudents() {
+        int notifiedCount = 0;
+        for (Student s : students.values()) {
+            boolean notified = false;
+
+            for (Subject sub : Subject.values()) {
+                if (s.notify(sub)) {
+                    System.out.printf("""
+                                    To: %s
+                                    Re: Your Learning Progress
+                                    Hello, %s! You have accomplished our %s course!
+                                    """,
+                            s.getEmail(),
+                            s.getName(),
+                            sub
+                    );
+                    notified = true;
+                }
+            }
+
+            if (notified) {
+                notifiedCount++;
+            }
+        }
+        System.out.printf("Total %d students have been notified.", notifiedCount);
     }
 
     private Student getStudentById(UUID id) {

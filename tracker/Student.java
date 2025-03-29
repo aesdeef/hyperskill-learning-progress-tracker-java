@@ -1,9 +1,6 @@
 package tracker;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.ToIntFunction;
 
 public class Student {
@@ -11,12 +8,17 @@ public class Student {
     private final String email;
     private final String name;
     private final List<Activity> activities;
+    private final Map<Subject, Boolean> notified;
 
     public Student(String email, String name) {
         this.id = UUID.randomUUID();
         this.email = email;
         this.name = name;
         this.activities = new ArrayList<>();
+        this.notified = new HashMap<>();
+        for (Subject sub : Subject.values()) {
+            this.notified.put(sub, false);
+        }
     }
 
     public String getId() {
@@ -53,5 +55,17 @@ public class Student {
             case SPRING -> Activity::spring;
         };
         return this.activities.stream().mapToInt(getGrades).filter(grade -> grade != 0).toArray();
+    }
+
+    public boolean notify(Subject subject) {
+        if (!this.notified.get(subject) && Arrays.stream(this.getSubject(subject)).sum() >= subject.target()) {
+            this.notified.put(subject, true);
+            return true;
+        }
+        return false;
+    }
+
+    public String getName() {
+        return name;
     }
 }
